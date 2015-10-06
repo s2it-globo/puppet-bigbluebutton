@@ -68,8 +68,10 @@ class bigbluebutton::install_meeting(
     }
 
     exec { 'configure-config-xml':
+        command      => "/bin/sed -e 's|http://|https://|g' -i /var/www/bigbluebutton/client/conf/config.xml",
+    }
+    exec { 'configure-config-xml-ip':
         command      => "/bin/sed -i -r 's/(\\b[0-9]{1,3}\\.){3}[0-9]{1,3}\\b'/${public_ip}/ /var/www/bigbluebutton/client/conf/config.xml",
-        cwd => '/var/www/bigbluebutton/client/lib/',
     }
 
     #adiciona https a chamada do bbb
@@ -168,6 +170,7 @@ class bigbluebutton::install_meeting(
     Exec["configure_bbb-properties"]->
 
     Exec["configure-config-xml"]->
+    Exec["configure-config-xml-ip"]->
     Exec["configure-bbb-api-conf-https"]->
 
     Exec["add-meeting-role-nginx"]->
