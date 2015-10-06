@@ -54,7 +54,7 @@ class bigbluebutton::install_bbb (
     }
 
     #instalando dependencias ffmpeg
-    $enhancers = ["build-essential", "git-core", "checkinstall", "yasm", "texi2html", "libvorbis-dev", "libx11-dev", "libxfixes-dev", "zlib1g-dev", "pkg-config", "netcat", "libncurses5-dev", "wget", "ant", "openjdk-7-jdk", "curl","openssl"]
+    $enhancers = ["build-essential", "git-core", "checkinstall", "yasm", "texi2html", "libvorbis-dev", "libx11-dev", "libxfixes-dev", "zlib1g-dev", "pkg-config", "netcat", "libncurses5-dev", "wget", "ant", "openjdk-7-jdk", "curl","openssl", "vim"]
     package { $enhancers:
         ensure => installed,
     }
