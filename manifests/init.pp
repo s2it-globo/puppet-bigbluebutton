@@ -42,7 +42,7 @@ class bigbluebutton (
     exec { 'runserver-bbb-html5':
         command=> '/bin/bash start.sh &',
         cwd    => "${user_home}/dev/bigbluebutton-master/bigbluebutton-html5/app",
-        path   => "\$PATH:${user_home}/.meteor"
+        path   => "\$PATH:${user_home}/.meteor",
         user   => $user_name,
         environment =>["HOME=${user_home}"],
     }
