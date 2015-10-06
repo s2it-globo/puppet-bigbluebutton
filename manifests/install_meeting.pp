@@ -84,9 +84,15 @@ class bigbluebutton::install_meeting(
     }
 
     # resources
+    # exec { 'configure-salt-bbb-conf':   
+    #     command      => "/bin/bash -c \"salt=\"\$(/usr/bin/bbb-conf --salt|grep Salt|cut -c13-44)\" && /bin/sed -i 's/bced839c079b4fe2543aefa73c7f6a57/\$salt/' bbb_api_conf.jsp\"",
+    #     cwd          => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/src/main/webapp",
+    # }
+
     exec { 'configure-salt-bbb-conf':   
-        command      => "/bin/bash -c \"salt=\"\$(/usr/bin/bbb-conf --salt|grep Salt|cut -c13-44)\" && /bin/sed -i 's/bced839c079b4fe2543aefa73c7f6a57/\$salt/' bbb_api_conf.jsp\"",
-        cwd          => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/src/main/webapp",
+        command      => "/bin/bash set_salt.sh",
+        cwd          => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        environment =>["HOME=${user_home}"],
     }
 
     exec { 'configure-host-bbb-conf':
