@@ -249,11 +249,11 @@ class bigbluebutton::install_html5(
         command      => '/bin/ln -f -s /etc/bigbluebutton/nginx/client_dev /etc/bigbluebutton/nginx/client.nginx',
     }
 
-    service { 'nginx':
-        enable      => true,
-        ensure      => running,
-        hasrestart => true,
-    }
+    #service { 'nginx':
+    #    enable      => true,
+    #    ensure      => running,
+    #    hasrestart => true,
+    #}
 
     exec { 'ant-locales':
         command      => '/usr/bin/ant locales',
@@ -371,7 +371,7 @@ class bigbluebutton::install_html5(
     Exec["configura-config-xml"]->
     File["/etc/bigbluebutton/nginx/client_dev"]->
     Exec["ajusta-link-simbolico-bbb-nginx"]->
-    Service["nginx"]->
+    #Service["nginx"]->
     Exec["ant-locales"]->
     Exec["ant"]->
 
