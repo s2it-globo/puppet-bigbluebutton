@@ -257,7 +257,7 @@ class bigbluebutton::install_html5(
     #}
 
     exec { 'ant-locales':
-        command      => '/bin/bash -c "ant locales"',
+        command      => "/usr/bin/ant locales",
         environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}"],
         path => $env_path, 
         cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
