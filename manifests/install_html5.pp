@@ -203,7 +203,7 @@ class bigbluebutton::install_html5(
 
     #fazendo download do fonte do bigbluebutton
     exec { 'download-bigbluebutton':
-        command      => "/usr/bin/wget ${url} -o v0.9.1.zip",
+        command      => "/usr/bin/wget ${url} -O v0.9.1.zip",
         cwd => "${user_home}/dev",
         user=>$user_name,
         unless => '/usr/bin/find -type d |grep ./bigbluebutton',
