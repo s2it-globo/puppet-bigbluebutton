@@ -5,7 +5,9 @@ class bigbluebutton (
 
     $public_ip = '172.16.42.230',
 
-    $bbb_url="https://github.com/bigbluebutton/bigbluebutton/archive/v0.9.1.zip"
+    $bbb_version="v0.9.1",
+
+    $environment="bigbluebutton",
 
     ) {
 
@@ -25,7 +27,8 @@ class bigbluebutton (
         user_name => $user_name,
         user_home => $user_home,
         public_ip => $public_ip,
-        bbb_url   => $bbb_url,
+        bbb_version=> $bbb_version,
+        environment => $environment,
     }
 
     # Install Metting
@@ -44,7 +47,7 @@ class bigbluebutton (
     # Starta html5
     exec { 'runserver-bbb-html5':
         command=> '/bin/bash start.sh &',
-        cwd    => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-html5/app",
+        cwd    => "${user_home}/dev/bigbluebutton/bigbluebutton-html5/app",
         environment =>["HOME=${user_home}", "PATH=\$PATH:${user_home}/.meteor"],
     }
 

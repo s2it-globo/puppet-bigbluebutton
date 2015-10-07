@@ -1,9 +1,10 @@
 class bigbluebutton::install_html5(
 
-	$user_name = undef,
-	$user_home = undef,
-    $public_ip = undef,
-    $bbb_url   = undef,
+	$user_name     = undef,
+	$user_home     = undef,
+    $public_ip     = undef,
+    $bbb_version   = undef,
+    $environment   = undef,
 
 	) {
 
@@ -193,54 +194,61 @@ class bigbluebutton::install_html5(
         cwd => "${tools_dir}/apache-flex-sdk-4.13.0-bin",
     }
 
+    if $environment == 'globo'{
+        $url = "https://gitlab.globoi.com/time-evolucao-infra/bigbluebutton/repository/archive.zip?ref=${bbb_version}"
+    }
+    elsif $environment=='bigbluebutton' {
+        $url = "https://codeload.github.com/bigbluebutton/bigbluebutton/zip/${bbb_version}"
+    }
+
     #fazendo download do fonte do bigbluebutton
     exec { 'download-bigbluebutton':
-        command      => "/usr/bin/wget ${bbb_url}",
+        command      => "/usr/bin/wget ${url} -o v0.9.1.zip",
         cwd => "${user_home}/dev",
         user=>$user_name,
-        unless => '/usr/bin/find -type d |grep ./bigbluebutton-0.9.1',
+        unless => '/usr/bin/find -type d |grep ./bigbluebutton',
         timeout => 1800,
     }
 
     #descompacta bigbluebutton
     exec { 'descompacta-bigbluebutton':
-        command      => '/usr/bin/unzip v0.9.1.zip && /bin/rm v0.9.1.zip',
+        command      => "/usr/bin/unzip v0.9.1.zip && /bin/rm v0.9.1.zip && /bin/mv \"bigbluebutton\"\* bigbluebutton",
         cwd =>"${user_home}/dev",
         user=> $user_name,
-        unless => '/usr/bin/find -type d |grep ./bigbluebutton-0.9.1',
+        unless => '/usr/bin/find -type d |grep ./bigbluebutton',
     }
 
     #copia config.xml
     exec { 'copia-config-xml':
         command      => '/bin/cp bigbluebutton-client/resources/config.xml.template bigbluebutton-client/src/conf/config.xml',
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1",
+        cwd =>"${user_home}/dev/bigbluebutton",
         user=>$user_name,
     }
 
     exec { 'set-head-xml':
         command      => '/usr/bin/head -n 10 bigbluebutton-client/src/conf/config.xml',
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1",
+        cwd =>"${user_home}/dev/bigbluebutton",
         user=>$user_name,
     }
 
     # #configura config.xml
     exec { 'configura-config-xml':
         command      => "/bin/sed -i s/HOST/${public_ip}/g bigbluebutton-client/src/conf/config.xml",
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1",
+        cwd =>"${user_home}/dev/bigbluebutton",
         user=>$user_name,
     }
 
     file { '/etc/bigbluebutton/nginx/client_dev':
         ensure => present,
         content=>"location /client/BigBlueButton.html {
-                    root ${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client;
+                    root ${user_home}/dev/bigbluebutton/bigbluebutton-client;
                     index index.html index.htm;
                     expires 1m;
                 }
 
                 # BigBlueButton Flash client.
                 location /client {
-                    root ${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client;
+                    root ${user_home}/dev/bigbluebutton/bigbluebutton-client;
                     index index.html index.htm;
                 }",
     }
@@ -260,7 +268,7 @@ class bigbluebutton::install_html5(
         command      => "/usr/bin/ant locales",
         environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}"],
         path => $env_path, 
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
+        cwd =>"${user_home}/dev/bigbluebutton/bigbluebutton-client",
         user=>$user_name,
         timeout=>1800,
     }
@@ -269,7 +277,7 @@ class bigbluebutton::install_html5(
         environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}", "ANT_OPTS=${env_ant_opts}"],
         path => $env_path, 
         command=> '/usr/bin/ant',
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
+        cwd =>"${user_home}/dev/bigbluebutton/bigbluebutton-client",
         user=>$user_name,
         timeout=>1800,
         # unless => "/bin/bash -c \"[ -d client ] && echo 'client' || echo ''\"",
@@ -306,7 +314,7 @@ class bigbluebutton::install_html5(
 
     exec { 'sed-config-start-sh':
         command      => "/bin/sed -i 's/HOME=\/usr\/share\/meteor //' start.sh",
-        cwd=> "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-html5/app",
+        cwd=> "${user_home}/dev/bigbluebutton/bigbluebutton-html5/app",
         user=>$user_name,
     }
 
