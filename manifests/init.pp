@@ -76,7 +76,7 @@ class bigbluebutton (
     #comandos deploy meeting
 
     # Finalizando configurações
-    Exec["enablewebrtc"]->
+    Exec["enable-webrtc"]->
     Exec["bbb-clean"] ->
     Exec["runserver-bbb-html5"]
  }
