@@ -195,7 +195,7 @@ class bigbluebutton::install_html5(
 
     #fazendo download do fonte do bigbluebutton
     exec { 'download-bigbluebutton':
-        command      => '/usr/bin/wget "${bbb_url}"',
+        command      => "/usr/bin/wget ${bbb_url}",
         cwd => "${user_home}/dev",
         user=>$user_name,
         unless => '/usr/bin/find -type d |grep ./bigbluebutton-0.9.1',
