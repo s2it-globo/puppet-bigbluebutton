@@ -12,7 +12,7 @@ class bigbluebutton::install_meeting(
     exec { 'clone-meeting':
         command      => '/usr/bin/git clone https://github.com/s2it-globo/bigbluebutton-meeting.git',
         user=>$user_name,
-        cwd => "${user_home}/dev/bigbluebutton-master",
+        cwd => "${user_home}/dev/bigbluebutton-0.9.1",
         unless =>'/bin/ls |grep bigbluebutton-meeting',
         timeout=>1800,
     }
@@ -23,7 +23,7 @@ class bigbluebutton::install_meeting(
     #copia os certificados para a pasta do nginx
     exec { 'copy-cert-ssl':
         command      => '/bin/cp bigbluebutton.key /etc/nginx/ssl && /bin/cp bigbluebutton.crt /etc/nginx/ssl',
-        cwd =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/certs/",
+        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting/certs/",
     }
 	#ajustando permissão nos certificados
     exec { 'define-permission-certs':
@@ -45,7 +45,7 @@ class bigbluebutton::install_meeting(
     #copy sip
     exec { 'copy-sip-nginx':
         command      => '/bin/cp sip.nginx /etc/bigbluebutton/nginx',
-        cwd => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
     }
     #ajusta a configuração do sip para https
     exec { 'configure-sip-nginx':
@@ -68,38 +68,36 @@ class bigbluebutton::install_meeting(
     }
 
     exec { 'configure-config-xml':
-        command      => "/bin/sed -e 's|http://|https://|g' -i /var/www/bigbluebutton/client/conf/config.xml",
-    }
-    exec { 'configure-config-xml-ip':
         command      => "/bin/sed -i -r 's/(\\b[0-9]{1,3}\\.){3}[0-9]{1,3}\\b'/${public_ip}/ /var/www/bigbluebutton/client/conf/config.xml",
+        cwd => '/var/www/bigbluebutton/client/lib/',
     }
 
     #adiciona https a chamada do bbb
     exec { 'configure-bbb-api-conf-https':
         command      => "/bin/sed -e 's|http://|https://|g' -i bbb_api_conf.jsp",
-        cwd => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/src/main/webapp",
+        cwd => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting/src/main/webapp",
     }
     #inserindo a regra do meeting no nginx
     exec { 'add-meeting-role-nginx':
         command      => '/bin/cp meeting.nginx /etc/bigbluebutton/nginx/',
-        cwd =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
     }
 
     # resources
     # exec { 'configure-salt-bbb-conf':   
     #     command      => "/bin/bash -c \"salt=\"\$(/usr/bin/bbb-conf --salt|grep Salt|cut -c13-44)\" && /bin/sed -i 's/bced839c079b4fe2543aefa73c7f6a57/\$salt/' bbb_api_conf.jsp\"",
-    #     cwd          => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/src/main/webapp",
+    #     cwd          => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting/src/main/webapp",
     # }
 
     exec { 'configure-salt-bbb-conf':   
         command      => "/bin/bash set_salt.sh",
-        cwd          => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd          => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
         environment =>["HOME=${user_home}"],
     }
 
     exec { 'configure-host-bbb-conf':
         command      => "/bin/sed -i \"s/172.16.42.29/${public_ip}/g\" bbb_api_conf.jsp",
-        cwd          =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting/src/main/webapp",
+        cwd          =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting/src/main/webapp",
     }
 
 
@@ -107,13 +105,13 @@ class bigbluebutton::install_meeting(
     #resolve as dependências do meeting
     exec { 'resolveDeps-meeting':
         command      => "${tools_dir}/gradle/bin/gradle resolveDeps",
-        cwd => "${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
         user => $user_name,
     }
     #compilando o meeting
     exec { 'build-meeting':
         command      => "${tools_dir}/gradle/bin/gradle build",
-        cwd =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
         user => $user_name,
     }
     #remove possíveis meetings antigos
@@ -123,12 +121,12 @@ class bigbluebutton::install_meeting(
     #compilando o meeting
     exec { 'copy-meeting-tomcat':
         command      => '/bin/cp build/libs/meeting.war /var/lib/tomcat7/webapps/',
-        cwd =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
     }
     #habilita o meeting para ficar na raiz exemplo http://172.16.42.1
     exec { 'define-meeting-enter-point':
         command      => '/bin/cp bigbluebutton /etc/nginx/sites-available/',
-        cwd =>"${user_home}/dev/bigbluebutton-master/bigbluebutton-meeting",
+        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-meeting",
     }
     #alter ip of host in nginx
     exec { 'alter-servername-nginx':
@@ -170,7 +168,6 @@ class bigbluebutton::install_meeting(
     Exec["configure_bbb-properties"]->
 
     Exec["configure-config-xml"]->
-    Exec["configure-config-xml-ip"]->
     Exec["configure-bbb-api-conf-https"]->
 
     Exec["add-meeting-role-nginx"]->
