@@ -48,6 +48,11 @@ class bigbluebutton (
         environment =>["HOME=${user_home}", 'JASMINE_SERVER_UNIT=0', 'JASMINE_SERVER_INTEGRATION=0', 'JASMINE_CLIENT_INTEGRATION=0', 'JASMINE_BROWSER=PhantomJS', 'JASMINE_MIRROR_PORT=3000', 'ROOT_URL=http://127.0.0.1/html5client'],
     }
 
+    #enable webrtc
+    exec { 'enable-webrtc':
+        command      => '/usr/bin/bbb-conf --enablewebrtc',
+    }
+
     file { $user_home:
         ensure => directory,
         owner    =>$user_name,
@@ -71,6 +76,7 @@ class bigbluebutton (
     #comandos deploy meeting
 
     # Finalizando configurações
+    Exec["enable-webrtc"]->
     Exec["bbb-clean"] ->
     Exec["runserver-bbb-html5"]
  }
