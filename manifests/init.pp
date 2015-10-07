@@ -5,7 +5,9 @@ class bigbluebutton (
 
     $public_ip = '172.16.42.230',
 
-    $bbb_url="https://github.com/bigbluebutton/bigbluebutton/archive/v0.9.1.zip"
+    $bbb_version="v0.9.1",
+
+    $environment="s2it",
 
     ) {
 
@@ -25,7 +27,8 @@ class bigbluebutton (
         user_name => $user_name,
         user_home => $user_home,
         public_ip => $public_ip,
-        bbb_url   => $bbb_url,
+        bbb_version=> $bbb_version,
+        environment => $environment,
     }
 
     # Install Metting
