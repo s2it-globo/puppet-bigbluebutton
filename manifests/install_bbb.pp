@@ -111,12 +111,6 @@ class bigbluebutton::install_bbb (
         ensure => installed,
     }
 
-    #enable webrtc
-    exec { 'enable-webrtc':
-        command      => '/usr/bin/bbb-conf --enablewebrtc',
-    }
-    
-
 
     Exec["ufw-allow-ports-tcp"] ->
     Exec["ufw-allow-ports-udp"] ->
@@ -141,6 +135,5 @@ class bigbluebutton::install_bbb (
 
     Package["bigbluebutton"]->
     Package["bbb-demo"]->
-    Package["bbb-check"] ->
-    Exec["enable-webrtc"]
+    Package["bbb-check"]
 }

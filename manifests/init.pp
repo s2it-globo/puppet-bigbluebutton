@@ -5,7 +5,7 @@ class bigbluebutton (
 
     $public_ip = '172.16.42.230',
 
-    $bbb_url="https://github.com/bigbluebutton/bigbluebutton/archive/v0.9.1.zip"
+    $bbb_url="v0.9.1.zip"
 
     ) {
 
@@ -48,6 +48,11 @@ class bigbluebutton (
         environment =>["HOME=${user_home}", "PATH=\$PATH:${user_home}/.meteor"],
     }
 
+    #enable webrtc
+    exec { 'enable-webrtc':
+        command      => '/usr/bin/bbb-conf --enablewebrtc',
+    }
+
     file { $user_home:
         ensure => directory,
         owner    =>$user_name,
@@ -71,6 +76,7 @@ class bigbluebutton (
     #comandos deploy meeting
 
     # Finalizando configurações
+    Exec["enablewebrtc"]->
     Exec["bbb-clean"] ->
     Exec["runserver-bbb-html5"]
  }
