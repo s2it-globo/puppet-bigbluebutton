@@ -7,7 +7,7 @@ class bigbluebutton (
 
     $bbb_version="v0.9.1",
 
-    $environment="bigbluebutton",
+    $environment="s2it",
 
     ) {
 

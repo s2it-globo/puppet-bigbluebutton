@@ -194,16 +194,16 @@ class bigbluebutton::install_html5(
         cwd => "${tools_dir}/apache-flex-sdk-4.13.0-bin",
     }
 
-    if $environment == 'globo'{
+    if $environment == 'globo' {
         $url = "https://gitlab.globoi.com/time-evolucao-infra/bigbluebutton/repository/archive.zip?ref=${bbb_version}"
     }
-    elsif $environment=='bigbluebutton' {
+    elsif $environment=='s2it' {
         $url = "https://codeload.github.com/bigbluebutton/bigbluebutton/zip/${bbb_version}"
     }
 
     #fazendo download do fonte do bigbluebutton
     exec { 'download-bigbluebutton':
-        command      => "/usr/bin/wget ${url} -O v0.9.1.zip",
+        command      => "/usr/bin/wget ${url} -O default.zip",
         cwd => "${user_home}/dev",
         user=>$user_name,
         unless => '/usr/bin/find -type d |grep ./bigbluebutton',
@@ -212,7 +212,7 @@ class bigbluebutton::install_html5(
 
     #descompacta bigbluebutton
     exec { 'descompacta-bigbluebutton':
-        command      => '/usr/bin/unzip v0.9.1.zip && /bin/rm v0.9.1.zip && /bin/mv "bigbluebutton"* bigbluebutton',
+        command      => '/usr/bin/unzip default.zip && /bin/rm default.zip && /bin/mv "bigbluebutton"* bigbluebutton',
         cwd =>"${user_home}/dev",
         user=> $user_name,
         unless => '/usr/bin/find -type d |grep ./bigbluebutton',
@@ -289,7 +289,7 @@ class bigbluebutton::install_html5(
         user=>$user_name,
         timeout=>1800,
         cwd => "${user_home}",
-        unless =>'/usr/bin/which meteor |grep meteor',
+        unless =>'/usr/bin/which',
     }
 
     exec { 'ajusta-config-xml-html5':
