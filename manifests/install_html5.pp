@@ -204,7 +204,7 @@ class bigbluebutton::install_html5(
 
     #descompacta bigbluebutton
     exec { 'descompacta-bigbluebutton':
-        command      => '/usr/bin/unzip bigbluebutton-0.9.1.zip && /bin/rm bigbluebutton-0.9.1.zip',
+        command      => '/usr/bin/unzip v0.9.1.zip && /bin/rm v0.9.1.zip',
         cwd =>"${user_home}/dev",
         user=> $user_name,
         unless => '/usr/bin/find -type d |grep ./bigbluebutton-0.9.1',
