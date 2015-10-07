@@ -13,7 +13,7 @@ class bigbluebutton::install_html5(
     $env_gradle_home = "/dev/tools/gradle"
     $env_sbt_home = "/dev/tools/sbt"
     $env_apache_flex = "/dev/tools/apache-flex-sdk-4.13.0-bin/bin"
-    $env_ant_opts = '-Xmx512m -XX:MaxPermSize=512m -XX:ReservedCodeCacheSize=1024m'
+    $env_ant_opts = '-Xms2048m -Xmx2048m -XX:MaxPermSize=1024m'
     $env_path = "\$PATH:${user_home}${env_grails_home}/bin:${user_home}${env_flex_home}/bin:${user_home}${env_gradle_home}/bin:${user_home}${env_sbt_home}/bin:${user_home}${env_apache_flex}/bin:"	
 
     $tools_dir = "${user_home}/dev/tools"
@@ -257,12 +257,12 @@ class bigbluebutton::install_html5(
     #}
 
     exec { 'ant-locales':
-        command      => '/bin/bash -c "/usr/bin/ant locales"',
-        environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}"],
-        path => $env_path, 
-        cwd =>"${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
-        user=>$user_name,
-        timeout=>1800,
+        environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}", "ANT_OPTS=${env_ant_opts}"],
+        path        => $env_path, 
+        cwd         => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
+        timeout     => 1800,
+        user        => $user_name,
+        command     => "/bin/bash -c '/usr/bin/ant locales'",
     }
 
     exec { "ant":
