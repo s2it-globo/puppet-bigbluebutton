@@ -5,7 +5,7 @@ class bigbluebutton (
 
     $public_ip = '172.16.42.230',
 
-    $bbb_url="v0.9.1.zip"
+    $bbb_url="https://github.com/bigbluebutton/bigbluebutton/archive/v0.9.1.zip"
 
     ) {
 
@@ -76,7 +76,7 @@ class bigbluebutton (
     #comandos deploy meeting
 
     # Finalizando configurações
-    Exec["enable-webrtc"]->
+    Exec["enablewebrtc"]->
     Exec["bbb-clean"] ->
     Exec["runserver-bbb-html5"]
  }
