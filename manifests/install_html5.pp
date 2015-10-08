@@ -15,8 +15,7 @@ class bigbluebutton::install_html5(
     $env_sbt_home = "/dev/tools/sbt"
     $env_apache_flex = "/dev/tools/apache-flex-sdk-4.13.0-bin"
     $env_ant_opts = '-Xms2048m -Xmx2048m -XX:MaxPermSize=1024m'
-    $env_path = "\$PATH:${user_home}${env_grails_home}/bin:${user_home}${env_flex_home}/bin:${user_home}${env_gradle_home}/bin:${user_home}${env_sbt_home}/bin:${user_home}${env_apache_flex}/bin:"	
-
+    $env_path = "\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$SBT_HOME/bin:\$FLEX_HOME/bin"
     $tools_dir = "${user_home}/dev/tools"
 
 	#criando diretório de ferramentas de dev
@@ -335,7 +334,7 @@ class bigbluebutton::install_html5(
         export SBT_HOME=\$HOME${env_sbt_home}
         export ANT_OPTS=\"${env_ant_opts}\"
 
-        export PATH=\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$SBT_HOME/bin:\$GRADLE_HOME/bin:\$FLEX_HOME/bin",
+        export PATH=\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$SBT_HOME/bin:\$FLEX_HOME/bin",
     }
 
 
