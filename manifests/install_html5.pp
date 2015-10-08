@@ -267,7 +267,7 @@ class bigbluebutton::install_html5(
     exec { 'ant-locales':
         environment => ["JAVA_HOME=${env_java_home}", "GRAILS_HOME=${user_home}${env_grails_home}", "FLEX_HOME=${user_home}${env_flex_home}", "GRADLE_HOME=${user_home}${env_gradle_home}", "SBT_HOME=${user_home}${env_sbt_home}", "ANT_OPTS=${env_ant_opts}"],
         path        => $env_path, 
-        cwd         => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-client",
+        cwd         => "${user_home}/dev/bigbluebutton/bigbluebutton-client",
         timeout     => 1800,
         user        => $user_name,
         command     => "/bin/bash -c '/usr/bin/ant locales'",
@@ -280,7 +280,6 @@ class bigbluebutton::install_html5(
         cwd =>"${user_home}/dev/bigbluebutton/bigbluebutton-client",
         user=>$user_name,
         timeout=>1800,
-        # unless => "/bin/bash -c \"[ -d client ] && echo 'client' || echo ''\"",
     }
 
     exec { 'downlaod-meteor':
@@ -289,7 +288,7 @@ class bigbluebutton::install_html5(
         user=>$user_name,
         timeout=>1800,
         cwd => "${user_home}",
-        unless =>'/usr/bin/which',
+        unless =>'/usr/bin/which meteor',
     }
 
     exec { 'ajusta-config-xml-html5':

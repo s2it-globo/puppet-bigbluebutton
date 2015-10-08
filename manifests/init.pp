@@ -46,8 +46,8 @@ class bigbluebutton (
 
     # Starta html5
     exec { 'runserver-bbb-html5':
-        command=> "${user_home}/.meteor &",
-        cwd    => "${user_home}/dev/bigbluebutton-0.9.1/bigbluebutton-html5/app",
+        command=> "${user_home}/.meteor/meteor &",
+        cwd    => "${user_home}/dev/bigbluebutton/bigbluebutton-html5/app",
         environment =>["HOME=${user_home}", 'JASMINE_SERVER_UNIT=0', 'JASMINE_SERVER_INTEGRATION=0', 'JASMINE_CLIENT_INTEGRATION=0', 'JASMINE_BROWSER=PhantomJS', 'JASMINE_MIRROR_PORT=3000', 'ROOT_URL=http://127.0.0.1/html5client'],
     }
 
