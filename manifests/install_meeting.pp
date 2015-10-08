@@ -144,9 +144,9 @@ class bigbluebutton::install_meeting(
         command      => "/bin/echo | openssl s_client -connect ${public_ip}:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_x.pem",
     }
     #gerando certificado java para SSL do bbb
-    # exec { 'import-cert-java':
-    #     command      => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias root -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
-    # }
+    exec { 'import-cert-java':
+         command      => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias root -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
+    }
 
      #restart tomcat7
     exec { 'restart-tomcat':
@@ -185,7 +185,7 @@ class bigbluebutton::install_meeting(
     Exec["setip-bbb"] ->
 
     Exec["generate-cert-java"]->
-    # Exec["import-cert-java"]->
+    Exec["import-cert-java"]->
 
     Exec["restart-tomcat"]
 
