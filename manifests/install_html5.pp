@@ -13,7 +13,7 @@ class bigbluebutton::install_html5(
     $env_flex_home = "/dev/tools/flex"
     $env_gradle_home = "/dev/tools/gradle"
     $env_sbt_home = "/dev/tools/sbt"
-    $env_apache_flex = "/dev/tools/apache-flex-sdk-4.13.0-bin/bin"
+    $env_apache_flex = "/dev/tools/apache-flex-sdk-4.13.0-bin"
     $env_ant_opts = '-Xms2048m -Xmx2048m -XX:MaxPermSize=1024m'
     $env_path = "\$PATH:${user_home}${env_grails_home}/bin:${user_home}${env_flex_home}/bin:${user_home}${env_gradle_home}/bin:${user_home}${env_sbt_home}/bin:${user_home}${env_apache_flex}/bin:"	
 
