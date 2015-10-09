@@ -18,7 +18,7 @@ class bigbluebutton::install_bbb (
 	#adicionando multiverse ao source_list
     exec { 'add-multiverse':
         command      => '/bin/echo "deb http://us.archive.ubuntu.com/ubuntu/ trusty multiverse" | sudo tee -a /etc/apt/sources.list',
-        unless => '/usr/bin/dpkg -l |grep bigbluebutton',
+        unless => "/bin/cat /etc/apt/sources.list |grep 'deb http://us.archive.ubuntu.com/ubuntu/ trusty multiverse'",
     }
 
     exec { 'apt-get-update1':
