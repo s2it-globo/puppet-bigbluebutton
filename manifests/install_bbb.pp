@@ -39,13 +39,13 @@ class bigbluebutton::install_bbb (
     #adicionando a chave do bigblueButton
     exec { 'bigblueButton-key':
         command      => '/usr/bin/wget http://ubuntu.bigbluebutton.org/bigbluebutton.asc -O- | sudo apt-key add -',
-        unless => '/usr/bin/dpkg -l |grep bigbluebutton',
+        unless => "/bin/cat /etc/apt/sources.list.d/bigbluebutton.list |grep 'deb http://ubuntu.bigbluebutton.org/trusty-090/ bigbluebutton-trusty main'",
     }
 
 	#adicionando repositorio bigbluebutton
     exec { 'source-list-bbb':
         command      => '/bin/echo "deb http://ubuntu.bigbluebutton.org/trusty-090/ bigbluebutton-trusty main" | sudo tee /etc/apt/sources.list.d/bigbluebutton.list',
-        unless => '/usr/bin/dpkg -l |grep bigbluebutton',
+        unless => "/bin/cat /etc/apt/sources.list.d/bigbluebutton.list |grep 'deb http://ubuntu.bigbluebutton.org/trusty-090/ bigbluebutton-trusty main'",
     }
 
     exec { 'apt-get-update2':
