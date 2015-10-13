@@ -134,7 +134,7 @@ class bigbluebutton::install_meeting(
     #setando o IP na qual o BibBlueButton vai responder, nesse caso pegamos o IP da interface eth1
     exec { 'setip-bbb':
         command  => "/usr/bin/bbb-conf --setip ${public_ip}",
-        unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
+        #unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
         timeout  => 1800,
     }
     exec { 'bbb-restart':
