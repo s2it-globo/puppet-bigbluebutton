@@ -153,6 +153,17 @@ class bigbluebutton::install_meeting(
     }
     #gerando certificado java para SSL do bbb
 
+    #gerando certificado java para SSL do bbb
+    exec { 'generate-cert-java-authapi':
+        command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
+        unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
+    }
+    exec { 'import-cert-java-authapi':
+         command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
+         unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
+    }
+    #gerando certificado java para SSL do bbb
+
     #Restartando tudo do bigbluebutton
     exec { 'bbb-clean':
         command      => '/usr/bin/bbb-conf --clean',
@@ -192,8 +203,12 @@ class bigbluebutton::install_meeting(
     Exec["setip-bbb"] ->
     Exec["bbb-restart"] ->
 
+
     Exec["generate-cert-java"]->
     Exec["import-cert-java"] ->
+
+    Exec["generate-cert-java-authapi"]->
+    Exec["import-cert-java-authapi"] ->
 
     Exec["bbb-clean"]
 }
