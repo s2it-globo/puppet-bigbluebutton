@@ -6,14 +6,14 @@ class bigbluebutton::install_bbb (
 
 
     #liberando as portas tcp no firewall
-    exec { 'ufw-allow-ports-tcp':
-        command      => '/bin/echo allow proto tcp from any to any port 80,1935,9123',
-    }
+    # exec { 'ufw-allow-ports-tcp':
+    #     command      => '/bin/echo allow proto tcp from any to any port 80,1935,9123',
+    # }
 
     #liberando as portas udp no firewall
-    exec { 'ufw-allow-ports-udp':
-        command      => '/bin/echo allow proto udp from any to any port 16384,32768',
-    }
+    # exec { 'ufw-allow-ports-udp':
+    #     command      => '/bin/echo allow proto udp from any to any port 16384,32768',
+    # }
 
 	#adicionando multiverse ao source_list
     exec { 'add-multiverse':
@@ -116,8 +116,8 @@ class bigbluebutton::install_bbb (
     }
 
 
-    Exec["ufw-allow-ports-tcp"] ->
-    Exec["ufw-allow-ports-udp"] ->
+    #Exec["ufw-allow-ports-tcp"] ->
+    #Exec["ufw-allow-ports-udp"] ->
 	Exec["add-multiverse"] ->
 
     Exec["apt-get-update1"] ->
