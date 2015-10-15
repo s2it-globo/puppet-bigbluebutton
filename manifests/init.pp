@@ -5,8 +5,6 @@ class bigbluebutton (
 
     $public_ip = '172.16.42.230',
     $enableAuthenticationLDAP = 'true',
-    $environment = 'globo',
-
     ) {
 
     #create user bigbluebutton
@@ -38,7 +36,6 @@ class bigbluebutton (
         user_home => $user_home,
         public_ip => $public_ip,
         enableAuthenticationLDAP => $enableAuthenticationLDAP,
-        environment => $environment,
 
     }
 
