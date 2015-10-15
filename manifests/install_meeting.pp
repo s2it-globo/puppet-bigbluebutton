@@ -23,12 +23,14 @@ class bigbluebutton::install_meeting(
         cwd     => "${user_home}/dev/bigbluebutton-meeting",
     }
 
-    exec { 'enableAuthenticationLDAP':
+
+    if $enableAuthenticationLDAP == 'false'{
+        exec { 'enableAuthenticationLDAP':
         command      => '/bin/sed -i "s|boolean enableAuthenticationLDAP = true;|boolean enableAuthenticationLDAP = false;|" bbb_api_conf.jsp',
         cwd          => "$user_home/dev/bigbluebutton-meeting/src/main/webapp",
-        onlyif       => $enableAuthenticationLDAP,
+        }
     }
-
+    
     # Clone and pull repository bigbluebutton-meeting
 
     #cria a pasta onde vão ficar os certificados para o SSL
@@ -199,8 +201,6 @@ class bigbluebutton::install_meeting(
     Exec["configure-salt-bbb-conf"]->
 
     Exec["add-meeting-role-nginx"]->
-
-    Exec["enableAuthenticationLDAP"]->
 
     Exec["resolveDeps-meeting"] ->
     Exec["build-meeting"] ->
