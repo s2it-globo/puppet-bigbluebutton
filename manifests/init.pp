@@ -4,7 +4,8 @@ class bigbluebutton (
     $user_home = '/home/bigbluebutton',
 
     $public_ip = '172.16.42.230',
-    $enableAuthentication = 'true',
+    $enableAuthenticationLDAP = 'true',
+    $environment = 'globo',
 
     ) {
 
@@ -36,7 +37,9 @@ class bigbluebutton (
         user_name => $user_name,
         user_home => $user_home,
         public_ip => $public_ip,
-        enableAuthentication => $enableAuthentication,
+        enableAuthenticationLDAP => $enableAuthenticationLDAP,
+        environment => $environment,
+
     }
 
 
