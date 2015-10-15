@@ -4,8 +4,6 @@ class bigbluebutton::install_meeting(
 	$user_home = undef,
 	$public_ip = undef,
     $enableAuthenticationLDAP = undef,
-    $environment = undef,
-
 	){
 
 	$tools_dir = "${user_home}/dev/tools"
@@ -165,7 +163,7 @@ class bigbluebutton::install_meeting(
     #gerando certificado java para SSL do bbb
 
     #gerando certificado java para SSL do bbb
-    if $environment == 'globo'{
+    if $enableAuthenticationLDAP == 'true'{
         exec { 'generate-cert-java-authapi':
             command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
             unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
