@@ -68,13 +68,13 @@ class bigbluebutton::install_meeting(
         }
     }
 
-    if enableAuthAPI == 'true'{
+    if $enableAuthAPI == 'true'{
         exec { 'enableAuthAPI':
             command      => "/bin/sed -i \"s|boolean enableAuthAPI = false;|boolean enableAuthAPI = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
         } 
     }
 
-    if enableMailSend == 'true'{
+    if $enableMailSend == 'true'{
         exec { 'enableMailSend':
             command      => "/bin/sed -i \"s|boolean enableMailSend = false;|boolean enableMailSend = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
         } 
