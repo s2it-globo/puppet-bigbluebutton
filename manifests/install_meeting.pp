@@ -205,9 +205,13 @@ class bigbluebutton::install_meeting(
         command => "/bin/echo | openssl s_client -connect ${public_ip}:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_x.pem",
         unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep bigbluebutton'
     }
+
+    exec { 'delete-cert-java':
+         command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -delete -noprompt -alias bigbluebutton -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit",
+    }
+
     exec { 'import-cert-java':
          command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias bigbluebutton -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
-         unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep bigbluebutton'
     }
     #gerando certificado java para SSL do bbb
 
@@ -256,9 +260,10 @@ class bigbluebutton::install_meeting(
 
 
     Exec["generate-cert-java"]->
+    Exec["delete-cert-java"] ->
     Exec["import-cert-java"] ->
 
     Exec["enable-webrtc"]->
-    
+
     Exec["bbb-clean"]
 }
