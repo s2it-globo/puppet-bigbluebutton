@@ -169,21 +169,21 @@ class bigbluebutton::install_meeting(
         cwd => '/etc/nginx/sites-available',
     }
 
-    # #enable webrtc
-    # exec { 'enable-webrtc':
-    #     command      => '/usr/bin/bbb-conf --enablewebrtc',
-    # }
+    #enable webrtc
+    exec { 'enable-webrtc':
+        command      => '/usr/bin/bbb-conf --enablewebrtc',
+    }
 
-    # #setando o IP na qual o BibBlueButton vai responder, nesse caso pegamos o IP da interface eth1
-    # exec { 'setip-bbb':
-    #     command  => "/usr/bin/bbb-conf --setip ${public_ip}",
-    #     #unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
-    #     timeout  => 1800,
-    # }
-    # exec { 'bbb-restart':
-    #     command      => '/usr/bin/bbb-conf --restart',
-    #     timeout  => 1800,
-    # }
+    #setando o IP na qual o BibBlueButton vai responder, nesse caso pegamos o IP da interface eth1
+    exec { 'setip-bbb':
+        command  => "/usr/bin/bbb-conf --setip ${public_ip}",
+        #unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
+        timeout  => 1800,
+    }
+    exec { 'bbb-restart':
+        command      => '/usr/bin/bbb-conf --restart',
+        timeout  => 1800,
+    }
 
      #gerando certificado java para SSL do bbb
     exec { 'generate-cert-java':
@@ -236,9 +236,9 @@ class bigbluebutton::install_meeting(
     Exec["define-meeting-enter-point"]->
     Exec["alter-servername-nginx"]->
 
-    #Exec["enable-webrtc"]->
-    #Exec["setip-bbb"] ->
-    #Exec["bbb-restart"] ->
+    Exec["enable-webrtc"]->
+    Exec["setip-bbb"] ->
+    Exec["bbb-restart"] ->
 
 
     Exec["generate-cert-java"]->
