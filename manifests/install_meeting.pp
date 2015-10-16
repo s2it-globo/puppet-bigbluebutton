@@ -208,6 +208,7 @@ class bigbluebutton::install_meeting(
 
     exec { 'delete-cert-java':
          command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -delete -noprompt -alias bigbluebutton -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit",
+         onlyif  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep bigbluebutton'
     }
 
     exec { 'import-cert-java':
