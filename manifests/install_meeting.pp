@@ -93,25 +93,13 @@ class bigbluebutton::install_meeting(
 
 
 
-    #copia os certificados para a pasta do nginx
-    exec { 'copy-config-openssl':
-        command => '/bin/cp openssl.cnf /usr/lib/ssl',
-        cwd     =>"${user_home}/dev/bigbluebutton-meeting/openssl/",
-    }
-
-    exec { 'remove-cert':
-        command      => '/bin/rm bigbluebutton.key bigbluebutton.crt',
-        cwd          =>"${user_home}/dev/bigbluebutton-meeting/openssl/",
-        onlyif       => "/bin/ls |grep bigbluebutton.crt",
-
-    }
-
     #generate certificate
     exec { 'generate-cert-openssl':
-        environment =>["SAN=${public_ip}"],
-        command      => "/usr/bin/openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/CN=BigBlueButton/O=BigBlueButton, Inc./C=US/ST=Oregon/L=Portland' -nodes -out bigbluebutton.crt -keyout bigbluebutton.key",
-        cwd          => "/etc/nginx/ssl/",
+        command      => "/bin/bash generate-cert.sh ${public_ip}",
+        cwd          => "${user_home}/dev/bigbluebutton-meeting",
     }
+
+
 
 
 
@@ -266,8 +254,6 @@ class bigbluebutton::install_meeting(
     Exec["clone-meeting"]->
 
     File["/etc/nginx/ssl"]->
-    Exec["remove-cert"] ->
-    Exec["copy-config-openssl"]->
     Exec["generate-cert-openssl"]->
     Exec["define-permission-certs"]->
     Exec["generate-key-pem"]->
