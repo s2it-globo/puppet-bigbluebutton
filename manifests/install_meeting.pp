@@ -4,6 +4,8 @@ class bigbluebutton::install_meeting(
 	$user_home = undef,
 	$public_ip = undef,
     $enableMailAuth = undef,
+    $enableAuthAPI = undef,
+    $enableMailSend = undef,
 
 	){
 
@@ -65,6 +67,19 @@ class bigbluebutton::install_meeting(
              unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
         }
     }
+
+    if enableAuthAPI == 'true'{
+        exec { 'enableAuthAPI':
+            command      => "/bin/sed -i \"s|boolean enableAuthAPI = false;|boolean enableAuthAPI = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
+        } 
+    }
+
+    if enableMailSend == 'true'{
+        exec { 'enableMailSend':
+            command      => "/bin/sed -i \"s|boolean enableMailSend = false;|boolean enableMailSend = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
+        } 
+    }
+
 
     #cria a pasta onde vão ficar os certificados para o SSL
     file { '/etc/nginx/ssl':
