@@ -57,6 +57,12 @@ class bigbluebutton::install_meeting(
     if $enableMailAuth == 'true'{
         exec { 'enableMailAuth':
             command      => "/bin/sed -i \"s|boolean enableMailAuth = false;|boolean enableMailAuth = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
+        }
+    }
+
+    if $enableAuthAPI == 'true'{
+        exec { 'enableAuthAPI':
+            command      => "/bin/sed -i \"s|boolean enableAuthAPI = false;|boolean enableAuthAPI = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
         } 
         exec { 'generate-cert-java-authapi':
             command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
@@ -66,12 +72,6 @@ class bigbluebutton::install_meeting(
              command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
              unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
         }
-    }
-
-    if $enableAuthAPI == 'true'{
-        exec { 'enableAuthAPI':
-            command      => "/bin/sed -i \"s|boolean enableAuthAPI = false;|boolean enableAuthAPI = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
-        } 
     }
 
     if $enableMailSend == 'true'{
