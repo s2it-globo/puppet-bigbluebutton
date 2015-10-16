@@ -85,11 +85,47 @@ class bigbluebutton::install_meeting(
     file { '/etc/nginx/ssl':
         ensure => directory,
     }
+
+
+    #######################################################################################################
+    # GERANDO CERTIFICICADO
+    #######################################################################################################
+
+
+
     #copia os certificados para a pasta do nginx
-    exec { 'copy-cert-ssl':
-        command => '/bin/cp bigbluebutton.key /etc/nginx/ssl && /bin/cp bigbluebutton.crt /etc/nginx/ssl',
-        cwd     =>"${user_home}/dev/bigbluebutton-meeting/certs/",
+    exec { 'copy-config-openssl':
+        command => '/bin/cp openssl.cnf /usr/lib/ssl',
+        cwd     =>"${user_home}/dev/bigbluebutton-meeting/openssl/",
     }
+
+    exec { 'remove-cert':
+        command      => '/bin/rm bigbluebutton.key bigbluebutton.crt',
+        cwd          =>"${user_home}/dev/bigbluebutton-meeting/openssl/",
+        onlyif       => "/bin/ls |grep bigbluebutton.crt",
+
+    }
+
+    #generate certificate
+    exec { 'generate-cert-openssl':
+        environment =>["SAN=${public_ip}"],
+        command      => "/usr/bin/openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/CN=BigBlueButton/O=BigBlueButton, Inc./C=US/ST=Oregon/L=Portland' -nodes -out bigbluebutton.crt -keyout bigbluebutton.key",
+        cwd          => "/etc/nginx/ssl/",
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	#ajustando permissão nos certificados
     exec { 'define-permission-certs':
         command      => '/bin/chmod 0600 bigbluebutton.key bigbluebutton.crt',
@@ -230,7 +266,9 @@ class bigbluebutton::install_meeting(
     Exec["clone-meeting"]->
 
     File["/etc/nginx/ssl"]->
-    Exec["copy-cert-ssl"]->
+    Exec["remove-cert"] ->
+    Exec["copy-config-openssl"]->
+    Exec["generate-cert-openssl"]->
     Exec["define-permission-certs"]->
     Exec["generate-key-pem"]->
     Exec["configure-file-external-xml"]->
