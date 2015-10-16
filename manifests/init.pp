@@ -4,7 +4,7 @@ class bigbluebutton (
     $user_home = '/home/bigbluebutton',
 
     $public_ip = '172.16.42.230',
-    $enableMailAuth = 'false',
+    $enableMailAuth = 'true',
     $enableAuthAPI = 'true',
     $enableMailSend = 'true',
     ) {
