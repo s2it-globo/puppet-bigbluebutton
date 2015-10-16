@@ -203,7 +203,6 @@ class bigbluebutton::install_meeting(
      #gerando certificado java para SSL do bbb
     exec { 'generate-cert-java':
         command => "/bin/echo | openssl s_client -connect ${public_ip}:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/bbb.pem",
-        unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep bigbluebutton'
     }
 
     exec { 'delete-cert-java':
