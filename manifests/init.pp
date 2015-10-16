@@ -4,8 +4,9 @@ class bigbluebutton (
     $user_home = '/home/bigbluebutton',
 
     $public_ip = '172.16.42.230',
-    $enableAuthenticationLDAP = 'true',
+    $enableMailAuth = 'true',
     ) {
+
 
     #create user bigbluebutton
     user { $user_name:
@@ -22,22 +23,15 @@ class bigbluebutton (
         public_ip => $public_ip,
     }
 
-
-    # Install html5
-    class{"bigbluebutton::install_html5": 
-        user_name => $user_name,
-        user_home => $user_home,
-        public_ip => $public_ip,
-    }
-
     # Install Metting
     class{"bigbluebutton::install_meeting": 
         user_name => $user_name,
         user_home => $user_home,
         public_ip => $public_ip,
-        enableAuthenticationLDAP => $enableAuthenticationLDAP,
+        enableMailAuth => $enableMailAuth,
 
     }
+
 
 
     #create user bigbluebutton
@@ -47,10 +41,6 @@ class bigbluebutton (
     # Add Packages
     Class["bigbluebutton::install_bbb"] ->
     # Add Packages
-
-    # Package environment DEV for HTML5
-    Class["bigbluebutton::install_html5"] ->
-    # Package environment DEV for HTML5
 
     #comandos deploy meeting
     Class["bigbluebutton::install_meeting"]

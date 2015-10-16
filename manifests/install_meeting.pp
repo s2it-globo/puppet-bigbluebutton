@@ -3,11 +3,46 @@ class bigbluebutton::install_meeting(
 	$user_name = undef,
 	$user_home = undef,
 	$public_ip = undef,
-    $enableAuthenticationLDAP = undef,
+    $enableMailAuth = undef,
+
 	){
 
 	$tools_dir = "${user_home}/dev/tools"
 
+    #criando diretório de ferramentas de dev
+    exec { 'cria-pasta-dev-tools':
+        command      => "/bin/mkdir -p ${tools_dir}",
+        user => $user_name,
+    }
+
+    #download gradle
+    exec { 'download-gradle':
+        command      => '/usr/bin/wget "http://services.gradle.org/distributions/gradle-1.10-bin.zip"',
+        cwd => $tools_dir,
+        user => $user_name,
+        unless => '/bin/ls |grep gradle-1.10',
+        timeout => 1800,
+    }
+    #descompacta gradle
+    exec { 'descompacta-gradle':
+        command      => '/usr/bin/unzip gradle-1.10-bin.zip && /bin/rm gradle-1.10-bin.zip',
+        cwd => $tools_dir,
+        user => $user_name,
+        unless => '/usr/bin/find -type d |grep ./gradle-1.10',
+    }
+    #cria link gradle
+    exec { 'cria-link-gradle':
+        command      => '/bin/ln -s gradle-1.10 gradle',
+        cwd => $tools_dir,
+        user => $user_name,
+        unless => '/usr/bin/find -type l |grep ./gradle',
+    }
+
+    exec { 'remove-meeting':
+        command => "/bin/rm -fr ${user_home}/dev/bigbluebutton-meeting",
+        user    => $user_name,
+        unless  => "/bin/ls |grep ${user_home}/dev/bigbluebutton-meeting",
+    }
 	# Clone and pull repository bigbluebutton-meeting
     exec { 'clone-meeting':
         command => '/usr/bin/git clone https://github.com/s2it-globo/bigbluebutton-meeting.git',
@@ -16,21 +51,20 @@ class bigbluebutton::install_meeting(
         unless  => '/bin/ls |grep bigbluebutton-meeting',
         timeout => 1800,
     }
-    exec { 'pull-meeting':
-        command => '/usr/bin/git pull',
-        user    => $user_name,
-        cwd     => "${user_home}/dev/bigbluebutton-meeting",
-    }
 
-
-    if $enableAuthenticationLDAP == 'false'{
-        exec { 'enableAuthenticationLDAP':
-        command      => '/bin/sed -i "s|boolean enableAuthenticationLDAP = true;|boolean enableAuthenticationLDAP = false;|" bbb_api_conf.jsp',
-        cwd          => "$user_home/dev/bigbluebutton-meeting/src/main/webapp",
+    if $enableMailAuth == 'true'{
+        exec { 'enableMailAuth':
+            command      => "/bin/sed -i \"s|boolean enableMailAuth = false;|boolean enableMailAuth = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
+        } 
+        exec { 'generate-cert-java-authapi':
+            command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
+            unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
+        } 
+        exec { 'import-cert-java-authapi':
+             command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
+             unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
         }
     }
-    
-    # Clone and pull repository bigbluebutton-meeting
 
     #cria a pasta onde vão ficar os certificados para o SSL
     file { '/etc/nginx/ssl':
@@ -135,21 +169,21 @@ class bigbluebutton::install_meeting(
         cwd => '/etc/nginx/sites-available',
     }
 
-    #enable webrtc
-    exec { 'enable-webrtc':
-        command      => '/usr/bin/bbb-conf --enablewebrtc',
-    }
+    # #enable webrtc
+    # exec { 'enable-webrtc':
+    #     command      => '/usr/bin/bbb-conf --enablewebrtc',
+    # }
 
-    #setando o IP na qual o BibBlueButton vai responder, nesse caso pegamos o IP da interface eth1
-    exec { 'setip-bbb':
-        command  => "/usr/bin/bbb-conf --setip ${public_ip}",
-        #unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
-        timeout  => 1800,
-    }
-    exec { 'bbb-restart':
-        command      => '/usr/bin/bbb-conf --restart',
-        timeout  => 1800,
-    }
+    # #setando o IP na qual o BibBlueButton vai responder, nesse caso pegamos o IP da interface eth1
+    # exec { 'setip-bbb':
+    #     command  => "/usr/bin/bbb-conf --setip ${public_ip}",
+    #     #unless   => "/usr/bin/curl -i -X GET --fail 'http://${public_ip}/'",
+    #     timeout  => 1800,
+    # }
+    # exec { 'bbb-restart':
+    #     command      => '/usr/bin/bbb-conf --restart',
+    #     timeout  => 1800,
+    # }
 
      #gerando certificado java para SSL do bbb
     exec { 'generate-cert-java':
@@ -162,27 +196,19 @@ class bigbluebutton::install_meeting(
     }
     #gerando certificado java para SSL do bbb
 
-    #gerando certificado java para SSL do bbb
-    if $enableAuthenticationLDAP == 'true'{
-        exec { 'generate-cert-java-authapi':
-            command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
-            unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
-        }
-        exec { 'import-cert-java-authapi':
-             command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
-             unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
-        }
-    }
-    #gerando certificado java para SSL do bbb
-
     #Restartando tudo do bigbluebutton
     exec { 'bbb-clean':
         command      => '/usr/bin/bbb-conf --clean',
         timeout  => 1800,
     }
 
+    Exec["cria-pasta-dev-tools"] ->
+    Exec["download-gradle"] ->
+    Exec["descompacta-gradle"] ->
+    Exec["cria-link-gradle"] ->
+
+    Exec["remove-meeting"]->
     Exec["clone-meeting"]->
-    Exec["pull-meeting"]->
 
     File["/etc/nginx/ssl"]->
     Exec["copy-cert-ssl"]->
@@ -210,16 +236,13 @@ class bigbluebutton::install_meeting(
     Exec["define-meeting-enter-point"]->
     Exec["alter-servername-nginx"]->
 
-    Exec["enable-webrtc"]->
-    Exec["setip-bbb"] ->
-    Exec["bbb-restart"] ->
+    #Exec["enable-webrtc"]->
+    #Exec["setip-bbb"] ->
+    #Exec["bbb-restart"] ->
 
 
     Exec["generate-cert-java"]->
     Exec["import-cert-java"] ->
-
-    # Exec["generate-cert-java-authapi"]->
-    # Exec["import-cert-java-authapi"] ->
 
     Exec["bbb-clean"]
 }
