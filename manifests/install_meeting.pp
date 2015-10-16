@@ -65,11 +65,11 @@ class bigbluebutton::install_meeting(
             command      => "/bin/sed -i \"s|boolean enableAuthAPI = false;|boolean enableAuthAPI = true;|\" $user_home/dev/bigbluebutton-meeting/src/main/webapp/bbb_api_conf.jsp",
         } 
         exec { 'generate-cert-java-authapi':
-            command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_y.pem",
+            command => "/bin/echo | openssl s_client -connect authapi.globoi.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/authapi.pem",
             unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
         } 
         exec { 'import-cert-java-authapi':
-             command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
+             command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias authapi -keystore /etc/ssl/certs/java/cacerts -file /tmp/authapi.pem -storepass changeit -keypass changeit",
              unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep authapi'
         }
     }
@@ -202,7 +202,7 @@ class bigbluebutton::install_meeting(
 
      #gerando certificado java para SSL do bbb
     exec { 'generate-cert-java':
-        command => "/bin/echo | openssl s_client -connect ${public_ip}:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/certificate_x.pem",
+        command => "/bin/echo | openssl s_client -connect ${public_ip}:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/bbb.pem",
         unless  => '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit -keypass changeit |grep bigbluebutton'
     }
 
@@ -212,7 +212,7 @@ class bigbluebutton::install_meeting(
     }
 
     exec { 'import-cert-java':
-         command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias bigbluebutton -keystore /etc/ssl/certs/java/cacerts -file /tmp/certificate_x.pem -storepass changeit -keypass changeit",
+         command => "/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool -import -noprompt -alias bigbluebutton -keystore /etc/ssl/certs/java/cacerts -file /tmp/bbb.pem -storepass changeit -keypass changeit",
     }
     #gerando certificado java para SSL do bbb
 
