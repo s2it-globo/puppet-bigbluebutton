@@ -91,7 +91,20 @@ class bigbluebutton::install_meeting(
     # GERANDO CERTIFICICADO
     #######################################################################################################
 
+    exec { 'add-email-config-openssl':
+        command      => "sed -i '8i SAN=\"email:support@example.com\"' /usr/lib/ssl/openssl.cnf",
+        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
+    }
 
+    exec { 'add-env1-config-openssl':
+        command      => "sed -i '219i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
+        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
+    }
+
+    exec { 'add-env2-config-openssl':
+        command      => "sed -i '227i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
+        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
+    }
 
     #generate certificate
     exec { 'generate-cert-openssl':
@@ -254,6 +267,9 @@ class bigbluebutton::install_meeting(
     Exec["clone-meeting"]->
 
     File["/etc/nginx/ssl"]->
+    Exec["add-email-config-openssl"]->
+    Exec["add-env1-config-openssl"]->
+    Exec["add-env2-config-openssl"]->
     Exec["generate-cert-openssl"]->
     Exec["define-permission-certs"]->
     Exec["generate-key-pem"]->
