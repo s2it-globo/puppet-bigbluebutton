@@ -98,7 +98,7 @@ class bigbluebutton::install_meeting(
 
     exec { 'add-env-config-openssl':
         command      => '/bin/sed -i \'219i subjectAltName=${ENV::SAN}\' /usr/lib/ssl/openssl.cnf && /bin/sed -i \'227i subjectAltName=${ENV::SAN}\' /usr/lib/ssl/openssl.cnf',
-        unless       => '/bin/cat /usr/lib/ssl/openssl.cnf|grep subjectAltName=${ENV::SAN}',
+        unless       => '/bin/cat /usr/lib/ssl/openssl.cnf|grep \'subjectAltName=${ENV::SAN}\'',
     }
 
     #generate certificate
