@@ -92,18 +92,13 @@ class bigbluebutton::install_meeting(
     #######################################################################################################
 
     exec { 'add-email-config-openssl':
-        command      => "/bin/sed -i '8i SAN=\"email:support@example.com\"' /usr/lib/ssl/openssl.cnf",
-        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
+        command      => '/bin/sed -i \'8i SAN="email:support@example.com"\' /usr/lib/ssl/openssl.cnf',
+        unless       => '/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com',
     }
 
-    exec { 'add-env1-config-openssl':
-        command      => "/bin/sed -i '219i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
-        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
-    }
-
-    exec { 'add-env2-config-openssl':
-        command      => "/bin/sed -i '227i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
-        unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
+    exec { 'add-env-config-openssl':
+        command      => '/bin/sed -i \'219i subjectAltName=${ENV::SAN}\' /usr/lib/ssl/openssl.cnf && /bin/sed -i \'227i subjectAltName=${ENV::SAN}\' /usr/lib/ssl/openssl.cnf',
+        unless       => '/bin/cat /usr/lib/ssl/openssl.cnf|grep subjectAltName=${ENV::SAN}',
     }
 
     #generate certificate
@@ -281,8 +276,7 @@ class bigbluebutton::install_meeting(
 
     File["/etc/nginx/ssl"]->
     Exec["add-email-config-openssl"]->
-    Exec["add-env1-config-openssl"]->
-    Exec["add-env2-config-openssl"]->
+    Exec["add-env-config-openssl"]->
     Exec["generate-cert-openssl"]->
     Exec["define-permission-certs"]->
     Exec["generate-key-pem"]->
