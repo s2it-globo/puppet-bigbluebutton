@@ -135,10 +135,6 @@ class bigbluebutton::install_meeting(
     exec { 'copy-sip-nginx':
         command      => "/bin/cp ${user_home}/dev/bigbluebutton-meeting/sip.nginx /etc/bigbluebutton/nginx",
     }
-    #ajusta a configuração do sip com o IP
-    exec { 'configure-sip-nginx-ip':
-        command      => "/bin/sed -i -e 's|HOST|${public_ip}|g' /etc/bigbluebutton/nginx/sip.nginx",
-    }
 
     #ajusta a configuração do arquivo bbb_webrtc
     exec { 'configure-webrtc-ssl':
@@ -245,6 +241,23 @@ class bigbluebutton::install_meeting(
         timeout  => 1800,
     }
 
+    #ajusta a configuração do sip com o IP
+    exec { 'configure-sip-nginx-ip':
+        command      => "/bin/sed -i -e  's/(\\b[0-9]{1,3}\\.){3}[0-9]{1,3}\\b'/${public_ip}/ /etc/bigbluebutton/nginx/sip.nginx",
+    }
+    exec { 'configure-sip-nginx-https':
+        command      => "/bin/sed -i -e 's|http|https|g' /etc/bigbluebutton/nginx/sip.nginx",
+    }
+    exec { 'configure-sip-nginx-port':
+        command      => "/bin/sed -i -e 's|5066|7443|g' /etc/bigbluebutton/nginx/sip.nginx",
+    }
+    service { 'nginx':
+        ensure => 'running',
+        enable  => "true",
+        hasrestart => "true",
+    }
+
+
     Exec["cria-pasta-dev-tools"] ->
     Exec["download-gradle"] ->
     Exec["descompacta-gradle"] ->
@@ -259,7 +272,7 @@ class bigbluebutton::install_meeting(
     Exec["generate-key-pem"]->
     Exec["configure-file-external-xml"]->
     Exec["copy-sip-nginx"]->
-    Exec["configure-sip-nginx-ip"]->
+    
     Exec["configure-webrtc-ssl"]->
 
     Exec["configure_bbb-properties"]->
@@ -289,5 +302,10 @@ class bigbluebutton::install_meeting(
 
     Exec["enable-webrtc"]->
 
-    Exec["bbb-clean"]
+    Exec["bbb-clean"] ->
+
+    Exec["configure-sip-nginx-ip"]->
+    Exec["configure-sip-nginx-https"]->
+    Exec["configure-sip-nginx-port"]->
+    Service["nginx"]
 }
