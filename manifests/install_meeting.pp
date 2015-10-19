@@ -254,7 +254,7 @@ class bigbluebutton::install_meeting(
         command      => "/bin/sed -i -e  's/(\\b[0-9]{1,3}\\.){3}[0-9]{1,3}\\b'/${public_ip}/ /etc/bigbluebutton/nginx/sip.nginx",
     }
     exec { 'configure-sip-nginx-https':
-        command      => "/bin/sed -i -e 's|http|https|g' /etc/bigbluebutton/nginx/sip.nginx",
+        command      => "/bin/sed -i -e 's|http://|https://|g' /etc/bigbluebutton/nginx/sip.nginx",
     }
     exec { 'configure-sip-nginx-port':
         command      => "/bin/sed -i -e 's|5066|7443|g' /etc/bigbluebutton/nginx/sip.nginx",
