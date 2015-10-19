@@ -92,17 +92,17 @@ class bigbluebutton::install_meeting(
     #######################################################################################################
 
     exec { 'add-email-config-openssl':
-        command      => "sed -i '8i SAN=\"email:support@example.com\"' /usr/lib/ssl/openssl.cnf",
+        command      => "/bin/sed -i '8i SAN=\"email:support@example.com\"' /usr/lib/ssl/openssl.cnf",
         unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
     }
 
     exec { 'add-env1-config-openssl':
-        command      => "sed -i '219i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
+        command      => "/bin/sed -i '219i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
         unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
     }
 
     exec { 'add-env2-config-openssl':
-        command      => "sed -i '227i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
+        command      => "/bin/sed -i '227i subjectAltName=${ENV::SAN}' /usr/lib/ssl/openssl.cnf",
         unless       => "/bin/cat /usr/lib/ssl/openssl.cnf|grep support@example.com",
     }
 
